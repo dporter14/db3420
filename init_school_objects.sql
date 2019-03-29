@@ -1,7 +1,7 @@
 /*
 Create all the tables for the school specifying their contstraints
 */
-\c school --connect to database school
+\c school; 
 
 create table if not exists employee (
     -- TO DO:
