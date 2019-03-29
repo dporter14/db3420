@@ -1,4 +1,4 @@
-drop table employee;
+drop table employee cascade;
 drop table faculty;
 drop table club;
 drop table department;
