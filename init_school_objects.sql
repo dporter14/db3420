@@ -3,91 +3,91 @@ Create all the tables for the school specifying their contstraints
 */
 \c school --connect to database school
 
-create if not exists employee (
+create table if not exists employee (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists faculty (
+create table if not exists faculty (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists club (
+create table if not exists club (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists department (
+create table if not exists department (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists course (
+create table if not exists course (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists section (
+create table if not exists section (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists student (
+create table if not exists student (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists building (
+create table if not exists building (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists room (
+create table if not exists room (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists equipment (
+create table if not exists equipment (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists locker (
+create table if not exists locker (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists joins (
+create table if not exists joins (
     -- TO DO:
     -- Attributes
     -- constraints
 )
 tablespace schoolData;
 
-create if not exists attends (
+create table if not exists attends (
     -- TO DO:
     -- Attributes
     -- constraints
