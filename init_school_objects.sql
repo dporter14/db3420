@@ -20,8 +20,14 @@ create table if not exists employee (
     departmentID integer not null, --foreign key
     hire_date date not null,
     end_date date,
-    roomID integer --foreign key
+    roomID integer, --foreign key
     -- constraints
+    constraint fk_departmentid foreign key (departmentID) references department,
+    constraint fk_roomid foreign key (roomID) references room,
+    constraint ck_ssn check(ssn > 0 and ssn < 999999999),
+    constraint ck_date check(dob > '1900-01-01'),
+    constraint ck_salary check(salary > 19999.99),
+    constraint ck_hire_date check(hire_date > '1900-01-01' and (hire_date < end_date or end_date like null)
 )
 tablespace schoolData;
 
@@ -30,8 +36,10 @@ create table if not exists faculty (
     -- Attributes
     employeeID serial not null, --foreign key (and primary key?)
     subjects varchar(50) default 'none',
-    degree varchar(50) default 'Bachelor'
+    degree varchar(50) default 'Bachelor',
     -- constraints
+    constraint pk_employeeid unique (employeeID),
+    constraint fk_employeeid foreign key (employeeID) references employee(employeeID)
 ) 
 tablespace schoolData;
 
@@ -44,8 +52,12 @@ create table if not exists club (
     facemployeeid integer not null, --foreign key
     headstudentid integer not null, --foreign key
     start_day date not null,
-    end_day date 
+    end_day date, 
     -- constraints
+    constraint fk_facemployeeid foreign key (facemployeeid) references faculty(employeeID),
+    constraint fk_headstudentid foreign key (headstudentid) references student(studentid),
+    constraint ck_founddate check(founddate > '1900-01-01'),
+    constraint ck_start_day (start_day > '1900-01-10' and (start_day < end_day or end_day like null)
 )
 tablespace schoolData;
 
@@ -59,6 +71,9 @@ create table if not exists department (
     start_day date not null,
     roomid integer not null --foreign key
     -- constraints
+    constraint fk_leademployeeid foreign key leademployeeid references employee(employeeID),
+    constraint fk_roomid foreign key roomid references room(roomid),
+    constraint ck_start_day check(start_day > '1900-01-01')
 )
 tablespace schoolData;
 
