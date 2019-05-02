@@ -9,5 +9,5 @@ drop table building cascade;
 drop table room cascade;
 drop table equipment cascade;
 drop table locker cascade;
-drop table joins cascade;
+drop table clubparticipation cascade;
 drop table attends cascade;
