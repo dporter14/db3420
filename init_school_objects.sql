@@ -34,12 +34,13 @@ TABLESPACE schoolData;
 CREATE TABLE IF NOT EXISTS room (
     -- TO DO:
     -- Attributes
-    ID smallserial PRIMARY KEY,
+    ID integer NOT NULL,
     maxoccupancy smallint NOT NULL DEFAULT '0',
     roomtype text NOT NULL DEFAULT 'office',
     buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE, --foreign key
     -- constraints
-    CONSTRAINT ck_maxoccupancy CHECK(maxoccupancy > 0)
+    CONSTRAINT ck_maxoccupancy CHECK(maxoccupancy > 0),
+    PRIMARY KEY (buildingid, ID)
 )
 TABLESPACE schoolData;
 
@@ -62,11 +63,12 @@ TABLESPACE schoolData;
 CREATE TABLE IF NOT EXISTS locker (
     -- TO DO:
     -- Attributes
-    ID smallserial PRIMARY KEY,
+    ID integer NOT NULL,
     lcombo char(8) NOT NULL DEFAULT '00-00-00',
     studentid integer REFERENCES student ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
-    buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE -- foreign key
-    -- constraints
+    buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE, -- foreign key
+    -- constraint
+    PRIMARY KEY (buildingid, ID)
 )
 TABLESPACE schoolData;
 
@@ -136,18 +138,19 @@ TABLESPACE schoolData;
 CREATE TABLE IF NOT EXISTS course (
     -- TO DO:
     -- Attributes
-    ID smallserial PRIMARY KEY,
+    ID integer NOT NULL,
     areaofstudy text DEFAULT 'Subject',
     coursename text DEFAULT 'Study Hall',
-    departmentid integer REFERENCES department ON DELETE SET NULL ON UPDATE CASCADE --foreign key
+    departmentid integer REFERENCES department ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     -- constraints
+    PRIMARY KEY (departmentid, ID)
 )
 TABLESPACE schoolData;
 
 CREATE TABLE IF NOT EXISTS section (
     -- TO DO:
     -- Attributes
-    ID serial PRIMARY KEY,
+    ID integer NOT NULL,
     classsize smallint NOT NULL DEFAULT 0,
     semsteryear char(5) NOT NULL DEFAULT 'F1950',
     instructionhours real NOT NULL DEFAULT '0',
