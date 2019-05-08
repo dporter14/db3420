@@ -1,7 +1,7 @@
 /*
 Create all the tables for the school specifying their contstraints
 */
-\c schooldb; 
+\c schooldb
 
 CREATE TABLE IF NOT EXISTS student (
     -- TO DO:
@@ -17,28 +17,26 @@ CREATE TABLE IF NOT EXISTS student (
     statecode char(2) NOT NULL DEFAULT 'CA',
     zip smallint NOT NULL CHECK(zip > 9999 AND zip < 100000) DEFAULT 99999
     -- constraints
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS building (
     -- TO DO:
     -- Attributes
-    id smallserial PRIMARY KEY,
+    id serial PRIMARY KEY,
     bname text NOT NULL DEFAULT 'Building'
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS room (
     -- TO DO:
     -- Attributes
-    id integer NOT NULL,
+    id serial PRIMARY KEY,
+    num smallint NOT NULL CHECK(num > 99 AND num < 1000) DEFAULT 100,
     maxoccupancy smallint NOT NULL CHECK(maxoccupancy > 0) DEFAULT '1',
     roomtype text NOT NULL DEFAULT 'office',
     buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE, --foreign key
     -- constraints
-    PRIMARY KEY (buildingid, id)
-)
-TABLESPACE schoolData;
+    UNIQUE (buildingid, num)
+);
 
 CREATE TABLE IF NOT EXISTS equipment (
     -- TO DO:
@@ -48,39 +46,31 @@ CREATE TABLE IF NOT EXISTS equipment (
     purchaseddate date NOT NULL,
     warrantydate date NOT NULL,
     makemodel text NOT NULL DEFAULT '',
-    roomid integer, --foreign key
-    buildingid integer, --foreign key
+    roomid smallint REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     placeddate date NOT NULL,
     -- constraints
-    FOREIGN KEY (buildingid, roomid) REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT ck_dates CHECK(warrantydate > purchaseddate AND placeddate >= purchaseddate)
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS locker (
     -- TO DO:
     -- Attributes
-    id integer NOT NULL,
+    id serial PRIMARY KEY,
     lcombo char(8) NOT NULL DEFAULT '00-00-00',
     studentid integer REFERENCES student ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
-    buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE, -- foreign key
+    buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE -- foreign key
     -- constraint
-    PRIMARY KEY (buildingid, id)
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS department (
     -- TO DO:
     -- Attributes
-    id smallserial PRIMARY KEY,
+    id serial PRIMARY KEY,
     dname text NOT NULL DEFAULT 'Department',
-    budget money NOT NULL CHECK(budget >= CAST(0 AS money)) DEFAULT 0,
-    roomid integer, --foreign key 
-    buildingid integer, --foreign key
+    budget numeric(20,2) NOT NULL CHECK(budget >= 0 ) DEFAULT 0,
+    roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE --foreign key 
     -- constraints
-    FOREIGN KEY (buildingid, roomid) REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE 
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS employee (
     -- TO DO:
@@ -99,13 +89,10 @@ CREATE TABLE IF NOT EXISTS employee (
     departmentid integer REFERENCES department ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     hiredate date NOT NULL,
     enddate date,
-    roomid integer, --foreign key 
-    buildingid integer, --foreign key
+    roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, --foreign key 
     -- constraints
-    FOREIGN KEY (buildingid, roomid) REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, 
     constraint ck_dates CHECK(dob > '1900-01-01' AND hiredate < enddate)
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS faculty (
     -- TO DO:
@@ -114,8 +101,7 @@ CREATE TABLE IF NOT EXISTS faculty (
     subjects text NOT NULL DEFAULT 'none',
     degree text NOT NULL DEFAULT 'Bachelors'
     -- constraints
-) 
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS club (
     -- TO DO:
@@ -129,40 +115,35 @@ CREATE TABLE IF NOT EXISTS club (
     enddate date, 
     -- constraints
     CONSTRAINT ck_dates CHECK(founddate > '1900-01-01' AND founddate <= startdate AND startdate < enddate )
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS course (
     -- TO DO:
     -- Attributes
-    id integer NOT NULL,
+    id serial PRIMARY KEY,
+    num integer NOT NULL,
     areaofstudy text DEFAULT 'Subject',
     coursename text DEFAULT 'Study Hall',
     departmentid integer REFERENCES department ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     -- constraints
-    PRIMARY KEY (departmentid, id)
-)
-TABLESPACE schoolData;
+    UNIQUE (departmentid, num)
+);
 
 CREATE TABLE IF NOT EXISTS section (
     -- TO DO:
     -- Attributes
-    id integer NOT NULL,
+    id serial PRIMARY KEY,
+    num integer NOT NULL,
     classsize smallint NOT NULL CHECK(classsize < 999 AND classsize > -1) DEFAULT 0,
     semsteryear char(5) NOT NULL DEFAULT 'F1950',
     instructionhours real NOT NULL CHECK(instructionhours >= 0) DEFAULT '0',
     classperiod char(1) NOT NULL CHECK(classperiod < '9' AND classperiod >= '0') DEFAULT '0',
     facemployeeid integer REFERENCES faculty ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
-    courseid integer , --foreign key
-    departmentid integer, --foreign key
-    roomid integer, --foreign key 
-    buildingid integer, --foreign key 
+    courseid integer REFERENCES course ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
+    roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, --foreign key 
     -- constraints
-    FOREIGN KEY (buildingid, roomid) REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, 
-    FOREIGN KEY (departmentid, courseid) REFERENCES course ON DELETE SET NULL ON UPDATE CASCADE,
-    PRIMARY KEY (departmentid, courseid, id)
-)
-TABLESPACE schoolData;
+    UNIQUE (courseid, num)
+);
 
 CREATE TABLE IF NOT EXISTS clubparticipation (
     -- TO DO:
@@ -172,22 +153,15 @@ CREATE TABLE IF NOT EXISTS clubparticipation (
     startdate date NOT NULL,
     enddate date,
     -- constraints
-    PRIMARY KEY (clubid, studentid),
     CONSTRAINT ck_dates CHECK(startdate <= enddate)
-)
-TABLESPACE schoolData;
+);
 
 CREATE TABLE IF NOT EXISTS attends (
     -- TO DO:
     -- Attributes
     studentid integer REFERENCES student ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL, --foreign key
-    departmentid integer NOT NULL, --foreign key
-    courseid integer NOT NULL, --foreign key
-    sectionid integer NOT NULL, --foreign key
-    grade varchar(2) DEFAULT 'A+',
-    register boolean NOT NULL DEFAULT false,
+    sectionid integer REFERENCES section ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL, --foreign key
+    grade varchar(2) NOT NULL DEFAULT 'A+',
+    register boolean NOT NULL DEFAULT false
     -- constraints
-    FOREIGN KEY (departmentid, courseid, sectionid) REFERENCES section ON DELETE RESTRICT ON UPDATE CASCADE,
-    PRIMARY KEY (departmentid, courseid, sectionid, studentid)
-)
-TABLESPACE schoolData;
+);

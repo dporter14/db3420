@@ -1,15 +1,11 @@
 /*
-Create the default, index, and temp tablespaces for school
 */
+CREATE DATABASE schooldb;
 
-create user school superuser password 'bchseagles'; --create role
+CREATE USER school SUPERUSER PASSWORD 'bchseagles';
 
-create tablespace schoolData
-    owner school
-    location '/var/lib/postgresql/dbs/school/data'; --first create empty directory as postgres user (sudo su postgres) or this will fail
+ALTER ROLE school SET client_encoding TO 'utf8';
+ALTER ROLE school SET default_transaction_isolation TO 'read committed';
+ALTER ROLE school SET timezone TO 'UTC';
 
-create tablespace schoolIdx
-    owner school
-    location '/var/lib/postgresql/dbs/school/idx'; --first create empty directory as postgres user (sudo su postgres) or this will fail
-
-create database schooldb with owner = school tablespace = schoolData;
+GRANT ALL PRIVILEGES ON DATABASE schooldb TO school;

@@ -1,4 +1,2 @@
-drop database school;
-drop tablespace schooldata;
-drop tablespace schoolidx;
+drop database schooldb;
 drop user school;
