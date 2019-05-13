@@ -67,3 +67,44 @@ RETURNS real AS $$
     
     END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION register_section(stuid integer, secid integer)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO attends (studentid, sectionid) VALUES (stuid, secid);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_student(firstname text, lastname text, birthdate date)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO student (fname, lname, DOB) VALUES (firstname, lastname, birthdate);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_building(buildingname text, floors integer, roomsperfloor integer)
+RETURNS void AS $$
+    DECLARE 
+        i integer;
+        j integer;
+        bid integer;
+        cap integer;
+    BEGIN
+        INSERT INTO building (bname) VALUES (buildingname);
+        SELECT id INTO bid FROM building WHERE bname = buildingname;
+        i = 1;
+        j = 0;
+        cap = floors + 1;
+        <<OUTERR>>
+        WHILE i < cap LOOP
+            <<INNER>>
+            WHILE j < roomsperfloor LOOP
+                INSERT INTO room (num, buildingid)
+                VALUES (i * 100 + j, bid);
+                j = j + 1;
+            END LOOP INNER;
+            i = i + 1;
+        END LOOP OUTERR;
+
+    END;
+$$ LANGUAGE plpgsql;

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS student (
     -- TO DO:
     -- Attributes
     id serial PRIMARY KEY,
-    gradelevel smallint CHECK(gradelevel >= 9 AND gradelevel <= 12) DEFAULT 9,
+    gradelevel integer CHECK(gradelevel >= 9 AND gradelevel <= 12) DEFAULT 9,
     fname text NOT NULL DEFAULT 'Jane',
     lname text NOT NULL DEFAULT 'Doe',
     DOB date NOT NULL CHECK(dob > '1900-01-01'), 
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS student (
     street text NOT NULL DEFAULT '',
     city text NOT NULL DEFAULT 'Bakersfield',
     statecode char(2) NOT NULL DEFAULT 'CA',
-    zip smallint NOT NULL CHECK(zip > 9999 AND zip < 100000) DEFAULT 99999
+    zip integer NOT NULL CHECK(zip > 9999 AND zip < 100000) DEFAULT 99999
     -- constraints
 );
 
@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS room (
     -- TO DO:
     -- Attributes
     id serial PRIMARY KEY,
-    num smallint NOT NULL CHECK(num > 99 AND num < 1000) DEFAULT 100,
-    maxoccupancy smallint NOT NULL CHECK(maxoccupancy > 0) DEFAULT '1',
-    roomtype text NOT NULL DEFAULT 'office',
+    num integer NOT NULL CHECK(num > 99 AND num < 1000) DEFAULT 100,
+    maxoccupancy integer NOT NULL CHECK(maxoccupancy > 0) DEFAULT '1',
+    roomtype text NOT NULL DEFAULT '',
     buildingid integer REFERENCES building ON DELETE CASCADE ON UPDATE CASCADE, --foreign key
     -- constraints
     UNIQUE (buildingid, num)
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS equipment (
     purchaseddate date NOT NULL,
     warrantydate date NOT NULL,
     makemodel text NOT NULL DEFAULT '',
-    roomid smallint REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
+    roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     placeddate date NOT NULL,
     -- constraints
     CONSTRAINT ck_dates CHECK(warrantydate > purchaseddate AND placeddate >= purchaseddate)
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS section (
     -- Attributes
     id serial PRIMARY KEY,
     num integer NOT NULL,
-    classsize smallint NOT NULL CHECK(classsize < 999 AND classsize > -1) DEFAULT 0,
+    classsize integer NOT NULL CHECK(classsize < 999 AND classsize > -1) DEFAULT 0,
     semesteryear char(5) NOT NULL DEFAULT 'F1950',
     instructionhours real NOT NULL CHECK(instructionhours >= 0) DEFAULT '0',
     classperiod char(1) NOT NULL CHECK(classperiod < '9' AND classperiod >= '0') DEFAULT '0',
