@@ -1,7 +1,6 @@
 /*
 Create all the tables for the school specifying their contstraints
 */
-\c schooldb
 
 CREATE TABLE IF NOT EXISTS student (
     -- TO DO:
@@ -135,7 +134,7 @@ CREATE TABLE IF NOT EXISTS section (
     id serial PRIMARY KEY,
     num integer NOT NULL,
     classsize smallint NOT NULL CHECK(classsize < 999 AND classsize > -1) DEFAULT 0,
-    semsteryear char(5) NOT NULL DEFAULT 'F1950',
+    semesteryear char(5) NOT NULL DEFAULT 'F1950',
     instructionhours real NOT NULL CHECK(instructionhours >= 0) DEFAULT '0',
     classperiod char(1) NOT NULL CHECK(classperiod < '9' AND classperiod >= '0') DEFAULT '0',
     facemployeeid integer REFERENCES faculty ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
