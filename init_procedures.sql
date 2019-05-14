@@ -98,7 +98,7 @@ RETURNS void AS $$
         <<OUTERR>>
         WHILE i < cap LOOP
             <<INNER>>
-            WHILE j < roomsperfloor LOOP
+            FOR j in 1..roomsperfloor LOOP
                 INSERT INTO room (num, buildingid)
                 VALUES (i * 100 + j, bid);
                 j = j + 1;
@@ -108,3 +108,18 @@ RETURNS void AS $$
 
     END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_locker(bid integer)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO locker (buildingid) VALUES (bid);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_department(depname text)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO department (dname) VALUES (depname);
+    END;
+$$ LANGUAGE plpgsql;
+
