@@ -19,17 +19,20 @@ RETURNS real AS $$
     DECLARE 
         gp real;
         av real;
+        res real;
         grades RECORD;
+        gr char(2);
     BEGIN
         gp = 0;
         av = 0;
         FOR grades 
         IN SELECT grade
-           FROM student_grades
-           WHERE stuid = student_grades.id
+            INTO gr
+           FROM attends
+           WHERE stuid = attends.studentid
         LOOP
             av = av + 1;
-            CASE grade
+             CASE gr
                 WHEN 'A+' THEN
                     gp = gp + 4.3;
                 WHEN 'A' THEN
@@ -57,21 +60,44 @@ RETURNS real AS $$
                 ELSE
                     gp = gp + 0;
             END CASE;
+/*
+            CASE grades::char
+                WHEN 'A+' THEN
+                    gp = gp + 4.3;
+                WHEN 'A' THEN
+                    gp = gp + 4.0;
+                WHEN 'A-' THEN
+                    gp = gp + 3.7;
+                WHEN 'B+' THEN
+                    gp = gp + 3.3;
+                WHEN 'B' THEN
+                    gp = gp + 3.0;
+                WHEN 'B-' THEN
+                    gp = gp + 2.7;
+                WHEN 'C+' THEN
+                    gp = gp + 2.3;
+                WHEN 'C' THEN
+                    gp = gp + 2.0;
+                WHEN 'C-' THEN
+                    gp = gp + 1.7;
+                WHEN 'D+' THEN
+                    gp = gp + 1.3;
+                WHEN 'D' THEN
+                    gp = gp + 1.0;
+                WHEN 'D-' THEN
+                    gp = gp + 0.7;
+                ELSE
+                    gp = gp + 0;
+            END CASE;
+*/
         END LOOP;
 
         IF av = 0 THEN
             RAISE EXCEPTION 'No grades found';
         END IF;
-
-        RETURN gp/av;
+        res = gp/av;
+        RETURN res;
     
-    END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION register_section(stuid integer, secid integer)
-RETURNS void AS $$
-    BEGIN
-        INSERT INTO attends (studentid, sectionid) VALUES (stuid, secid);
     END;
 $$ LANGUAGE plpgsql;
 
@@ -137,15 +163,23 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION insert_faculty(empid integer)
 RETURNS void AS $$
+    DECLARE
+        subjname text;
     BEGIN
-        INSERT INTO faculty(id) VALUES (empid);
+        SELECT dname
+        INTO subjname
+        FROM department 
+            INNER JOIN employee ON department.id = employee.departmentid
+        WHERE empid = employee.id;
+
+        INSERT INTO faculty(id, subjects) VALUES (empid, subjname);
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_club(clubn text, found date, facultyid integer, headstuid integer)
+CREATE OR REPLACE FUNCTION insert_club(clubn text, founded date, facultyid integer, headstuid integer)
 RETURNS void AS $$
     BEGIN
-        INSERT INTO club(clubName, founddate, faceemployeeid, headstudentid, startdate) VALUES (clubn, found, facultyid, headstuid, found);
+        INSERT INTO club(clubName, founddate, facemployeeid, headstudentid, startdate) VALUES (clubn, founded, facultyid, headstuid, founded);
     END;
 $$ LANGUAGE plpgsql;
 
@@ -174,5 +208,19 @@ RETURNS void AS $$
         EXECUTE format('DELETE FROM %I '
             'WHERE $1 = id', tablename) 
             USING pk;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION register_section(stuid integer, secid integer)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO attends (studentid, sectionid) VALUES (stuid, secid);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION join_club(stuid integer, cluid integer, joindate date)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO clubparticipation(studentid, clubid, startdate) VALUES (stuid, cluid, joindate);
     END;
 $$ LANGUAGE plpgsql;

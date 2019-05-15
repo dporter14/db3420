@@ -161,6 +161,6 @@ CREATE TABLE IF NOT EXISTS attends (
     studentid integer REFERENCES student ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL, --foreign key
     sectionid integer REFERENCES section ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL, --foreign key
     grade varchar(2) NOT NULL DEFAULT 'A+',
-    register boolean NOT NULL DEFAULT false
+    register boolean NOT NULL DEFAULT true;
     -- constraints
 );

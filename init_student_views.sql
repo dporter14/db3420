@@ -11,11 +11,11 @@ CREATE VIEW student_grades AS
         emp.fname || ' ' || emp.lname AS facname,
         att.grade
     FROM attends att 
-        INNER JOIN student stu ON att.studentid = stu.id
-        INNER JOIN section sec ON att.sectionid = sec.id
-        INNER JOIN course cours ON sec.courseid = cours.id 
-        INNER JOIN faculty fac ON sec.facemployeeid = fac.id
-        INNER JOIN employee emp ON fac.id = emp.id;
+        JOIN student stu ON att.studentid = stu.id
+        JOIN section sec ON att.sectionid = sec.id
+        JOIN course cours ON sec.courseid = cours.id 
+        JOIN faculty fac ON sec.facemployeeid = fac.id
+        JOIN employee emp ON fac.id = emp.id;
 
 CREATE VIEW student_clubs AS
     SELECT stu.id AS id,
