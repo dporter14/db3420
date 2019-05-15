@@ -109,10 +109,15 @@ RETURNS void AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_locker(bid integer)
+CREATE OR REPLACE FUNCTION insert_locker(bid integer, lockercount integer)
 RETURNS void AS $$
+    DECLARE
+        i integer;
     BEGIN
-        INSERT INTO locker (buildingid) VALUES (bid);
+        i = 1;
+        FOR i IN 1..lockercount LOOP
+            INSERT INTO locker (buildingid) VALUES (bid);
+        END LOOP;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -123,3 +128,51 @@ RETURNS void AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION insert_employee(firname text, lastname text, socialsn integer, birthdate date, sexid char(1), depid integer, hireday date)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO employee(fname, lname, ssn, DOB, sex, departmentid, hiredate) VALUES (firname, lastname, socialsn, birthdate, sexid, depid, hireday);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_faculty(empid integer)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO faculty(id) VALUES (empid);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_club(clubn text, found date, facultyid integer, headstuid integer)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO club(clubName, founddate, faceemployeeid, headstudentid, startdate) VALUES (clubn, found, facultyid, headstuid, found);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_course(cno integer, subj text, cname text, depid integer)
+RETURNS void AS $$
+    BEGIN
+        INSERT INTO course(num, areaofstudy, coursename, departmentid) VALUES (cno, subj, cname, depid);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_section(num_of_sections integer, semyear char(5), cid integer)
+RETURNS void AS $$
+    DECLARE
+        i integer;
+    BEGIN
+        i = 1;
+        FOR i IN 1..num_of_sections LOOP
+            INSERT INTO section(num, semesteryear, courseid) VALUES (i, semyear, cid);
+        END LOOP;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION delete_row(tablename text, pk integer)
+RETURNS void AS $$
+    BEGIN
+        EXECUTE format('DELETE FROM %I '
+            'WHERE $1 = id', tablename) 
+            USING pk;
+    END;
+$$ LANGUAGE plpgsql;
