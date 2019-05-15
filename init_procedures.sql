@@ -27,10 +27,12 @@ RETURNS real AS $$
         av = 0;
         FOR grades 
         IN SELECT grade
-            INTO gr
            FROM attends
            WHERE stuid = attends.studentid
         LOOP
+            SELECT grade INTO gr
+            FROM attends
+            WHERE stuid = attends.studentid AND attends.grade = grades;
             av = av + 1;
              CASE gr
                 WHEN 'A+' THEN
@@ -101,10 +103,10 @@ RETURNS real AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_student(firstname text, lastname text, birthdate date)
+CREATE OR REPLACE FUNCTION insert_student(firstname text, lastname text, birthdate date, sexid char(1))
 RETURNS void AS $$
     BEGIN
-        INSERT INTO student (fname, lname, DOB) VALUES (firstname, lastname, birthdate);
+        INSERT INTO student (fname, lname, DOB, sex) VALUES (firstname, lastname, birthdate, sexid);
     END;
 $$ LANGUAGE plpgsql;
 
@@ -135,6 +137,33 @@ RETURNS void AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION insert_building(buildingname text, rtype text, floors integer, roomsperfloor integer)
+RETURNS void AS $$
+    DECLARE 
+        i integer;
+        j integer;
+        bid integer;
+        cap integer;
+    BEGIN
+        INSERT INTO building (bname) VALUES (buildingname);
+        SELECT id INTO bid FROM building WHERE bname = buildingname;
+        i = 1;
+        j = 0;
+        cap = floors + 1;
+        <<OUTERR>>
+        WHILE i < cap LOOP
+            <<INNER>>
+            FOR j in 1..roomsperfloor LOOP
+                INSERT INTO room (num, buildingid, roomtype)
+                VALUES (i * 100 + j, bid, rtype);
+                j = j + 1;
+            END LOOP INNER;
+            i = i + 1;
+        END LOOP OUTERR;
+
+    END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION insert_locker(bid integer, lockercount integer)
 RETURNS void AS $$
     DECLARE
@@ -154,10 +183,19 @@ RETURNS void AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_employee(firname text, lastname text, socialsn integer, birthdate date, sexid char(1), depid integer, hireday date)
+CREATE OR REPLACE FUNCTION insert_employee(isfaculty boolean, firname text, lastname text, socialsn integer, birthdate date, sexid char(1), depid integer, hireday date, salr numeric(20,2))
 RETURNS void AS $$
+    DECLARE eid integer;
     BEGIN
-        INSERT INTO employee(fname, lname, ssn, DOB, sex, departmentid, hiredate) VALUES (firname, lastname, socialsn, birthdate, sexid, depid, hireday);
+        INSERT INTO employee(fname, lname, ssn, DOB, sex, departmentid, hiredate, salary) VALUES (firname, lastname, socialsn, birthdate, sexid, depid, hireday, salr);
+        IF isfaculty THEN
+            SELECT id
+            INTO eid
+            FROM employee
+            WHERE ssn = socialsn AND DOB = birthdate AND sex = sexid;
+
+            PERFORM insert_faculty(eid);
+        END IF;
     END;
 $$ LANGUAGE plpgsql;
 

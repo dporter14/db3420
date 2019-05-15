@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS department (
     -- Attributes
     id serial PRIMARY KEY,
     dname text NOT NULL DEFAULT 'Department',
-    budget numeric(20,2) NOT NULL CHECK(budget >= 0 ) DEFAULT 0,
+    budget money NOT NULL CHECK(budget >= 0::money ) DEFAULT 0,
     roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE --foreign key 
     -- constraints
 );
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS employee (
     city text NOT NULL DEFAULT 'Bakersfield',
     statecode char(2) NOT NULL DEFAULT 'CA',
     zip integer NOT NULL CHECK(zip > 9999 AND zip < 100000) DEFAULT 99999,
-    salary money NOT NULL CHECK(salary >= CAST(0 AS money)) DEFAULT 0,
+    salary money NOT NULL CHECK(salary >= 0::money) DEFAULT 0,
     departmentid integer REFERENCES department ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     hiredate date NOT NULL,
     enddate date,
@@ -161,6 +161,6 @@ CREATE TABLE IF NOT EXISTS attends (
     studentid integer REFERENCES student ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL, --foreign key
     sectionid integer REFERENCES section ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL, --foreign key
     grade varchar(2) NOT NULL DEFAULT 'A+',
-    register boolean NOT NULL DEFAULT true;
+    register boolean NOT NULL DEFAULT true
     -- constraints
 );
