@@ -16,90 +16,59 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION calc_student_gpa(stuid integer)
 RETURNS real AS $$
-    DECLARE 
-        gp real;
-        av real;
-        res real;
-        grades RECORD;
-        gr char(2);
+    DECLARE
+        total_courses integer;
+        grade_count integer;
+        point_count real;
+        gpa real;
     BEGIN
-        gp = 0;
-        av = 0;
-        FOR grades 
-        IN SELECT grade
-           FROM attends
-           WHERE stuid = attends.studentid
-        LOOP
-            SELECT grade INTO gr
-            FROM attends
-            WHERE stuid = attends.studentid AND attends.grade = grades;
-            av = av + 1;
-             CASE gr
-                WHEN 'A+' THEN
-                    gp = gp + 4.3;
-                WHEN 'A' THEN
-                    gp = gp + 4.0;
-                WHEN 'A-' THEN
-                    gp = gp + 3.7;
-                WHEN 'B+' THEN
-                    gp = gp + 3.3;
-                WHEN 'B' THEN
-                    gp = gp + 3.0;
-                WHEN 'B-' THEN
-                    gp = gp + 2.7;
-                WHEN 'C+' THEN
-                    gp = gp + 2.3;
-                WHEN 'C' THEN
-                    gp = gp + 2.0;
-                WHEN 'C-' THEN
-                    gp = gp + 1.7;
-                WHEN 'D+' THEN
-                    gp = gp + 1.3;
-                WHEN 'D' THEN
-                    gp = gp + 1.0;
-                WHEN 'D-' THEN
-                    gp = gp + 0.7;
-                ELSE
-                    gp = gp + 0;
-            END CASE;
-/*
-            CASE grades::char
-                WHEN 'A+' THEN
-                    gp = gp + 4.3;
-                WHEN 'A' THEN
-                    gp = gp + 4.0;
-                WHEN 'A-' THEN
-                    gp = gp + 3.7;
-                WHEN 'B+' THEN
-                    gp = gp + 3.3;
-                WHEN 'B' THEN
-                    gp = gp + 3.0;
-                WHEN 'B-' THEN
-                    gp = gp + 2.7;
-                WHEN 'C+' THEN
-                    gp = gp + 2.3;
-                WHEN 'C' THEN
-                    gp = gp + 2.0;
-                WHEN 'C-' THEN
-                    gp = gp + 1.7;
-                WHEN 'D+' THEN
-                    gp = gp + 1.3;
-                WHEN 'D' THEN
-                    gp = gp + 1.0;
-                WHEN 'D-' THEN
-                    gp = gp + 0.7;
-                ELSE
-                    gp = gp + 0;
-            END CASE;
-*/
-        END LOOP;
+        total_courses = 0;
+        grade_count = 0;
+        point_count = 0;
+        gpa = 0;
 
-        IF av = 0 THEN
-            RAISE EXCEPTION 'No grades found';
+        SELECT count(grade)
+        INTO grade_count
+        FROM attends
+        WHERE grade LIKE 'A%';
+        total_courses = total_courses + grade_count;
+        point_count = point_count + (grade_count * 4);
+
+        SELECT count(grade)
+        INTO grade_count
+        FROM attends
+        WHERE grade LIKE 'B%';
+        total_courses = total_courses + grade_count;
+        point_count = point_count + (grade_count * 3);
+
+        SELECT count(grade)
+        INTO grade_count
+        FROM attends
+        WHERE grade LIKE 'C%';
+        total_courses = total_courses + grade_count;
+        point_count = point_count + (grade_count * 2);
+
+        SELECT count(grade)
+        INTO grade_count
+        FROM attends
+        WHERE grade LIKE 'D%';
+        total_courses = total_courses + grade_count;
+        point_count = point_count + (grade_count * 1);
+
+        SELECT count(grade)
+        INTO grade_count
+        FROM attends
+        WHERE grade LIKE 'F%';
+        total_courses = total_courses + grade_count;
+        point_count = point_count + (grade_count * 0);
+
+        IF total_courses = 0 THEN
+            RAISE EXCEPTION 'No grades available';
         END IF;
-        res = gp/av;
-        RETURN res;
-    
+
+        gpa = point_count / total_courses;
+
+        RETURN gpa; 
     END;
 $$ LANGUAGE plpgsql;
 
@@ -217,25 +186,28 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION insert_club(clubn text, founded date, facultyid integer, headstuid integer)
 RETURNS void AS $$
     BEGIN
-        INSERT INTO club(clubName, founddate, facemployeeid, headstudentid, startdate) VALUES (clubn, founded, facultyid, headstuid, founded);
+        INSERT INTO club(clubName, founddate, facemployeeid, headstudentid, startdate) 
+        VALUES (clubn, founded, facultyid, headstuid, founded);
     END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION insert_course(cno integer, subj text, cname text, depid integer)
 RETURNS void AS $$
     BEGIN
-        INSERT INTO course(num, areaofstudy, coursename, departmentid) VALUES (cno, subj, cname, depid);
+        INSERT INTO course(num, areaofstudy, coursename, departmentid)
+        VALUES (cno, subj, cname, depid);
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_section(num_of_sections integer, semyear char(5), cid integer)
+CREATE OR REPLACE FUNCTION insert_section(num_of_sections integer, semyear char(5), facid integer, cid integer)
 RETURNS void AS $$
     DECLARE
         i integer;
     BEGIN
         i = 1;
         FOR i IN 1..num_of_sections LOOP
-            INSERT INTO section(num, semesteryear, courseid) VALUES (i, semyear, cid);
+            INSERT INTO section(num, semesteryear, courseid, facemployeeid) 
+            VALUES (i, semyear, cid, facid);
         END LOOP;
     END;
 $$ LANGUAGE plpgsql;
@@ -260,5 +232,12 @@ CREATE OR REPLACE FUNCTION join_club(stuid integer, cluid integer, joindate date
 RETURNS void AS $$
     BEGIN
         INSERT INTO clubparticipation(studentid, clubid, startdate) VALUES (stuid, cluid, joindate);
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION assign_teacher(facid integer, secid integer)
+RETURNS void AS $$
+    BEGIN
+        UPDATE section SET facemployeeid = facid  WHERE secid = section.id;
     END;
 $$ LANGUAGE plpgsql;

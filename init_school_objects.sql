@@ -139,9 +139,8 @@ CREATE TABLE IF NOT EXISTS section (
     classperiod char(1) NOT NULL CHECK(classperiod < '9' AND classperiod >= '0') DEFAULT '0',
     facemployeeid integer REFERENCES faculty ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
     courseid integer REFERENCES course ON DELETE SET NULL ON UPDATE CASCADE, --foreign key
-    roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE, --foreign key 
+    roomid integer REFERENCES room ON DELETE SET NULL ON UPDATE CASCADE --foreign key 
     -- constraints
-    UNIQUE (courseid, num)
 );
 
 CREATE TABLE IF NOT EXISTS clubparticipation (
