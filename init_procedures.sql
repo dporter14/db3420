@@ -30,35 +30,35 @@ RETURNS real AS $$
         SELECT count(grade)
         INTO grade_count
         FROM attends
-        WHERE grade LIKE 'A%';
+        WHERE studentid = stuid AND grade LIKE 'A%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 4);
 
         SELECT count(grade)
         INTO grade_count
         FROM attends
-        WHERE grade LIKE 'B%';
+        WHERE studentid = stuid AND grade LIKE 'B%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 3);
 
         SELECT count(grade)
         INTO grade_count
         FROM attends
-        WHERE grade LIKE 'C%';
+        WHERE studentid = stuid AND grade LIKE 'C%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 2);
 
         SELECT count(grade)
         INTO grade_count
         FROM attends
-        WHERE grade LIKE 'D%';
+        WHERE studentid = stuid AND grade LIKE 'D%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 1);
 
         SELECT count(grade)
         INTO grade_count
         FROM attends
-        WHERE grade LIKE 'F%';
+        WHERE studentid = stuid AND grade LIKE 'F%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 0);
 
@@ -246,5 +246,14 @@ CREATE OR REPLACE FUNCTION assign_locker(stuid integer, lockid integer)
 RETURNS void AS $$
     BEGIN
         UPDATE locker SET studentid = stuid WHERE lockid = locker.id;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_grade(stuid integer, secid integer, new_grade varchar(2))
+RETURNS void AS $$
+    BEGIN
+        UPDATE attends 
+        SET grade = new_grade
+        WHERE attends.studentid = stuid AND attends.sectionid = secid;
     END;
 $$ LANGUAGE plpgsql;
