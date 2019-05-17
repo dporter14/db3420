@@ -241,3 +241,10 @@ RETURNS void AS $$
         UPDATE section SET facemployeeid = facid  WHERE secid = section.id;
     END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION assign_locker(stuid integer, lockid integer)
+RETURNS void AS $$
+    BEGIN
+        UPDATE locker SET studentid = stuid WHERE lockid = locker.id;
+    END;
+$$ LANGUAGE plpgsql;

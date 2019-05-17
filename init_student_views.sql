@@ -15,7 +15,8 @@ CREATE VIEW student_grades AS
         INNER JOIN section sec ON att.sectionid = sec.id
         INNER JOIN course cours ON sec.courseid = cours.id 
         INNER JOIN faculty fac ON sec.facemployeeid = fac.id
-        INNER JOIN employee emp ON fac.id = emp.id;
+        INNER JOIN employee emp ON fac.id = emp.id
+    ORDER BY sec.semesteryear;
 
 CREATE VIEW student_clubs AS
     SELECT stu.id AS id,
@@ -24,7 +25,8 @@ CREATE VIEW student_clubs AS
         clubpart.startdate
     FROM clubparticipation clubpart
         INNER JOIN student stu ON clubpart.studentid = stu.id 
-        INNER JOIN club clu ON clu.clubid = clubpart.clubid;
+        INNER JOIN club clu ON clu.clubid = clubpart.clubid
+    ORDER BY clubpart.startdate;
 
 CREATE VIEW student_locker AS
     SELECT stu.id AS id,
@@ -32,4 +34,5 @@ CREATE VIEW student_locker AS
         lock.buildingid || '' || lock.id AS lockernum,
         lock.lcombo AS lockcode
     FROM locker lock 
-        INNER JOIN student stu ON stu.id = lock.studentid;
+        INNER JOIN student stu ON stu.id = lock.studentid
+    ORDER BY lockernum;
