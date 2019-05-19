@@ -36,3 +36,21 @@ CREATE VIEW student_locker AS
     FROM locker lock 
         INNER JOIN student stu ON stu.id = lock.studentid
     ORDER BY lockernum;
+
+CREATE VIEW student_schedule AS
+    SELECT stu.id AS id, 
+        cours.areaofstudy || ' ' || cours.num AS course,
+        cours.coursename || '_0' || sec.num AS section,
+        emp.lname AS teacher,
+        build.id || '-' || room.num AS room,
+        sec.classperiod
+    FROM attends att
+        INNER JOIN student stu ON att.studentid = stu.id
+        INNER JOIN section sec ON att.sectionid = sec.id
+        INNER JOIN course cours ON sec.courseid = cours.id
+        INNER JOIN faculty fac ON sec.facemployeeid = fac.id
+        INNER JOIN employee emp ON fac.id = emp.id
+        INNER JOIN room ON sec.roomid = room.id
+        INNER JOIN building build ON room.buildingid = build.id
+    WHERE sec.semesteryear = '2017F'::char(5)
+    ORDER BY sec.classperiod;

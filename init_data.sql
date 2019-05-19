@@ -2,17 +2,17 @@ SELECT insert_student('David'::text, 'Porter'::text, '1997-05-09'::date, 'M'::ch
 SELECT insert_student('Mason'::text, 'Pierce'::text, '1997-07-15'::date, 'M'::char);
 SELECT insert_student('Hayden'::text, 'Hess'::text, '1996-09-28'::date, 'M'::char);
 SELECT insert_student('Sarah'::text, 'Meramte'::text, '1998-11-30'::date, 'F'::char);
-SELECT insert_student('Rachel'::text, 'Khan'::text, '2000-06-13'::date, 'F'::char);
+SELECT insert_student('Elijah'::text, 'Wood'::text, '2000-06-13'::date, 'F'::char);
 
 
 
 
 
-SELECT insert_building('Admin'::text, 'Office'::text, 1, 20);
 SELECT insert_building('100'::text, 'Classroom'::text, 1, 10);
 SELECT insert_building('200'::text, 'Classroom'::text, 1, 10);
 SELECT insert_building('300'::text, 'Classroom'::text, 1, 10);
 SELECT insert_building('400'::text, 'Classroom'::text, 1, 10);
+SELECT insert_building('Admin'::text, 'Office'::text, 1, 20);
 SELECT insert_locker(1, 100);
 SELECT insert_locker(2, 100);
 SELECT insert_locker(3, 100);
@@ -83,10 +83,6 @@ SELECT assign_locker(2, 29);
 SELECT assign_locker(3, 52);
 SELECT assign_locker(4, 76);
 SELECT assign_locker(5, 42);
-
-
-
-
 
 
 
@@ -224,6 +220,7 @@ SELECT register_section(1, 69);
 SELECT register_section(1, 77);
 SELECT register_section(1, 86);
 SELECT register_section(1, 94);
+SELECT register_section(1, 103);
 SELECT register_section(2, 2);
 SELECT register_section(2, 10);
 SELECT register_section(2, 19);
@@ -272,6 +269,32 @@ SELECT register_section(5, 73);
 SELECT register_section(5, 81);
 SELECT register_section(5, 90);
 SELECT register_section(5, 98);
+
+SELECT assign_period(7, 1, 2);
+SELECT assign_period(95, 1, 22);
+SELECT assign_period(31, 2, 23);
+SELECT assign_period(71, 2, 3);
+SELECT assign_period(15, 3, 34);
+SELECT assign_period(103, 3, 4);
+SELECT assign_period(39, 4, 5);
+SELECT assign_period(63, 4, 25);
+SELECT assign_period(87, 5, 14);
+SELECT assign_period(47, 6, 37);
+SELECT assign_period(55, 6, 17);
+SELECT assign_period(23, 7, 18);
+SELECT assign_period(79, 7, 38);
+
+SELECT register_section(1, 7);
+SELECT register_section(1, 31);
+SELECT register_section(1, 39);
+SELECT register_section(1, 87);
+SELECT register_section(1, 47);
+SELECT register_section(1, 23);
+SELECT register_section(2, 71);
+SELECT register_section(2, 15);
+SELECT register_section(2, 63);
+SELECT register_section(2, 55);
+SELECT register_section(2, 79);
 
 SELECT update_grade(1,  1, 'A+'::varchar(2));
 SELECT update_grade(1,  9, 'A'::varchar(2));

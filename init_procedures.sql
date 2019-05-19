@@ -14,7 +14,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION calc_student_gpa(stuid integer)
+CREATE OR REPLACE FUNCTION calc_student_gpa(stuid integer, semyear char(5))
 RETURNS real AS $$
     DECLARE
         total_courses integer;
@@ -29,36 +29,46 @@ RETURNS real AS $$
 
         SELECT count(grade)
         INTO grade_count
-        FROM attends
-        WHERE studentid = stuid AND grade LIKE 'A%';
+        FROM student_grades 
+        WHERE id = stuid 
+            AND semesteryear = semyear
+            AND grade LIKE 'A%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 4);
 
         SELECT count(grade)
         INTO grade_count
-        FROM attends
-        WHERE studentid = stuid AND grade LIKE 'B%';
+        FROM student_grades 
+        WHERE id = stuid 
+            AND semesteryear = semyear
+            AND grade LIKE 'B%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 3);
 
         SELECT count(grade)
         INTO grade_count
-        FROM attends
-        WHERE studentid = stuid AND grade LIKE 'C%';
+        FROM student_grades 
+        WHERE id = stuid 
+            AND semesteryear = semyear
+            AND grade LIKE 'C%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 2);
 
         SELECT count(grade)
         INTO grade_count
-        FROM attends
-        WHERE studentid = stuid AND grade LIKE 'D%';
+        FROM student_grades 
+        WHERE id = stuid 
+            AND semesteryear = semyear
+            AND grade LIKE 'D%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 1);
 
         SELECT count(grade)
         INTO grade_count
-        FROM attends
-        WHERE studentid = stuid AND grade LIKE 'F%';
+        FROM student_grades
+        WHERE id = stuid 
+            AND semesteryear = semyear
+            AND grade LIKE 'F%';
         total_courses = total_courses + grade_count;
         point_count = point_count + (grade_count * 0);
 
@@ -255,5 +265,15 @@ RETURNS void AS $$
         UPDATE attends 
         SET grade = new_grade
         WHERE attends.studentid = stuid AND attends.sectionid = secid;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION assign_period(secid integer, periodno integer, room integer)
+RETURNS void AS $$
+    BEGIN
+        UPDATE section 
+        SET classperiod = periodno,
+            roomid = room
+        WHERE secid = section.id;
     END;
 $$ LANGUAGE plpgsql;
